@@ -182,12 +182,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        const currentUser = DB.getCurrentUser();
         const sale = {
             date: new Date().toISOString(),
             customer: customerName || 'عميل نقدي',
             paymentType: paymentType,
             items: cart.map(item => ({id: item.id, name: item.name, price: item.price, quantity: item.quantity, cost: item.cost})),
-            total: parseFloat(grandTotalElement.innerText)
+            total: parseFloat(grandTotalElement.innerText),
+            user: currentUser ? currentUser.name : 'غير محدد'
         };
 
         await DB.saveSale(sale);

@@ -476,6 +476,10 @@
                 <span class="info-label">طريقة الدفع:</span>
                 <span class="info-value" id="paymentType">---</span>
             </div>
+            <div class="info-group">
+                <span class="info-label">البائع:</span>
+                <span class="info-value" id="userName">---</span>
+            </div>
         </div>
 
         <table class="items-table">
@@ -610,6 +614,9 @@
             const paymentText = sale.paymentType === 'cash' ? 'نقدي' : 'آجل (دين)';
             const badgeClass = sale.paymentType === 'cash' ? 'badge-cash' : 'badge-debt';
             paymentTypeEl.innerHTML = `<span class="payment-badge ${badgeClass}">${paymentText}</span>`;
+
+            // Display user name
+            document.getElementById('userName').textContent = sale.user || 'غير محدد';
 
             // Display items
             const tbody = document.getElementById('itemsTableBody');

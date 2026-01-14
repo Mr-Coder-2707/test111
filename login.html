@@ -129,7 +129,7 @@
             </button>
         </form>
         <p style="margin-top: 1.5rem; color: var(--text-gray); font-size: 0.9rem;">
-            تلميح: admin / 123 للوصول الكامل
+            تلميح: mahmoud / 2707 أو mohamd / 1208 للوصول الكامل
         </p>
         <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
             <p style="font-size: 0.85rem; color: var(--text-gray); margin: 0.5rem 0;">
@@ -159,10 +159,21 @@
             console.log('Username:', u, 'Length:', u.length);
             console.log('Password:', p, 'Length:', p.length);
             
-            if ((u === 'admin' && p === '123') || (u === 'cashier' && p === '123')) {
+            if ((u === 'mahmoud' && p === '2707') || (u === 'mohamd' && p === '1208') || (u === 'cashier' && p === '123')) {
+                let userName = 'الكاشير';
+                let userRole = 'staff';
+                
+                if (u === 'mahmoud') {
+                    userName = 'المهندس محمود صبري الخواص';
+                    userRole = 'admin';
+                } else if (u === 'mohamd') {
+                    userName = 'المهندس محمد صبري الخواص';
+                    userRole = 'admin';
+                }
+                
                 const user = {
-                    name: u === 'admin' ? 'المدير العام' : 'الكاشير',
-                    role: u === 'admin' ? 'admin' : 'staff',
+                    name: userName,
+                    role: userRole,
                     username: u
                 };
                 DB.setCurrentUser(user);
