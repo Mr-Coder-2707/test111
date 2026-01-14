@@ -1,0 +1,896 @@
+:root {
+  --primary-color: #00d2ff;
+  --secondary-color: #3a7bd5;
+  --bg-dark: #0f172a;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --text-white: #f8fafc;
+  --text-gray: #94a3b8;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Outfit", "Inter", sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top right, #1e293b, #0f172a);
+  color: var(--text-white);
+  min-height: 100vh;
+  padding-bottom: 50px;
+  direction: rtl; /* Arabic support */
+}
+
+/* Glassmorphism Navigation */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .nav-actions {
+        gap: 0.5rem;
+    }
+    .nav-actions .btn {
+        padding: 0.5rem;
+        width: 35px;
+        height: 35px;
+    }
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(
+    to right,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: var(--text-gray);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+
+.nav-toggle {
+    display: none;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.nav-close {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+    font-size: 1.3rem;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    transition: var(--transition);
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+    width: auto;
+    min-width: auto;
+}
+
+.nav-close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .nav-toggle { display: block; }
+    .nav-close { display: block; }
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: #0f172a;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        flex-direction: column;
+        padding: 5rem 2rem 2rem;
+        gap: 1.5rem;
+        transition: var(--transition);
+        z-index: 1000;
+        backdrop-filter: blur(20px);
+        border-right: 1px solid var(--glass-border);
+    }
+    .nav-links.active { right: 0; }
+    
+    nav {
+        padding: 0.75rem 1rem;
+    }
+
+    .logo {
+        font-size: 1.25rem;
+    }
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem auto;
+        padding: 0 0.75rem;
+    }
+    .card {
+        padding: 1.25rem !important;
+        border-radius: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Inputs & Buttons */
+input,
+select,
+button {
+  outline: none;
+  border-radius: 0.75rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--glass-border);
+  color: white;
+  transition: var(--transition);
+}
+
+input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Table Style */
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th {
+  text-align: right;
+  padding: 1rem;
+  color: var(--text-gray);
+  font-weight: 600;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* POS Layout */
+.pos-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+}
+
+@media (max-width: 992px) {
+  .pos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+    .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .table-container th, .table-container td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .total-amount {
+        font-size: 1.5rem;
+    }
+}
+
+.search-results {
+  position: absolute;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #1e293b;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  z-index: 100;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.search-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.search-item:hover {
+  background: rgba(0, 210, 255, 0.1);
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.total-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px dashed var(--glass-border);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.total-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+/* Dashboard & Stats */
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card.blue { background: linear-gradient(135deg, #3a7bd5, #00d2ff); }
+.stat-card.green { background: linear-gradient(135deg, #10b981, #059669); }
+.stat-card.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.stat-card.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+.stat-card i {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 4rem;
+    opacity: 0.15;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-gray);
+}
+
+/* Modal & Notification Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-card {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.toast {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    animation: toastSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastSlide {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.success { border-right: 4px solid var(--success); }
+.toast.error { border-right: 4px solid var(--danger); }
+.toast.warning { border-right: 4px solid var(--warning); }
+
+/* تحسينات إضافية للهواتف المحمولة */
+@media (max-width: 768px) {
+    /* تحسين الجداول على الهواتف */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -1.25rem;
+        padding: 0 1.25rem;
+    }
+    
+    table {
+        min-width: 100%;
+        font-size: 0.85rem;
+    }
+    
+    th, td {
+        padding: 0.75rem 0.5rem;
+        white-space: nowrap;
+    }
+    
+    /* تحسين الأزرار */
+    .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        min-height: 44px; /* حد أدنى للمس السهل */
+    }
+    
+    /* تحسين حقول الإدخال */
+    input, select {
+        font-size: 16px !important; /* منع التكبير التلقائي في iOS */
+        min-height: 44px;
+        padding: 0.75rem;
+    }
+    
+    /* تحسين قسم الإجمالي */
+    .total-section {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+    
+    .total-amount {
+        font-size: 1.75rem;
+    }
+    
+    /* تحسين شبكة POS */
+    .pos-grid {
+        gap: 1rem;
+    }
+    
+    /* تحسين نتائج البحث */
+    .search-results {
+        max-height: 200px;
+        font-size: 0.9rem;
+    }
+    
+    .search-item {
+        padding: 0.65rem 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* للشاشات الصغيرة جداً */
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+        margin: 0.75rem auto;
+    }
+    
+    .card {
+        padding: 1rem !important;
+        border-radius: 0.75rem !important;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .logo {
+        font-size: 1.1rem;
+    }
+    
+    .nav-links {
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    table {
+        font-size: 0.8rem;
+    }
+    
+    th, td {
+        padding: 0.5rem 0.35rem;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.85rem;
+    }
+    
+    .total-amount {
+        font-size: 1.5rem;
+    }
+    
+    /* تحسين الأزرار الكبيرة */
+    #checkoutBtn {
+        height: 50px !important;
+        font-size: 1rem !important;
+    }
+    
+    /* تحسين حجم الأيقونات */
+    .fas, .far {
+        font-size: 1rem;
+    }
+}
+
+/* تحسينات للمس والتفاعل */
+@media (hover: none) and (pointer: coarse) {
+    /* للأجهزة اللمسية فقط */
+    .btn:active {
+        transform: scale(0.95);
+    }
+    
+    .search-item:active {
+        background: rgba(0, 210, 255, 0.2);
+    }
+    
+    .nav-links a:active {
+        background: rgba(0, 210, 255, 0.1);
+    }
+}
+
+/* منع التكبير عند التركيز على الحقول في iOS */
+@supports (-webkit-touch-callout: none) {
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* تحسين التمرير السلس */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+/* تحسينات إضافية للتطبيق على الهاتف */
+body {
+    overflow-x: hidden;
+}
+
+/* تحسين شبكة البطاقات للهاتف */
+@media (max-width: 768px) {
+    .stats-grid,
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        gap: 0.75rem !important;
+    }
+    
+    /* تحسين بطاقات الإحصائيات */
+    .stat-card {
+        padding: 1rem !important;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.75rem !important;
+    }
+    
+    .stat-card p {
+        font-size: 0.85rem !important;
+    }
+    
+    /* تحسين الرسوم البيانية */
+    canvas {
+        max-height: 250px !important;
+    }
+    
+    /* تحسين Modal على الهاتف */
+    .modal-content {
+        width: 95% !important;
+        max-width: 500px !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        padding: 1.5rem !important;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem !important;
+    }
+    
+    /* تحسين أزرار الإجراءات */
+    .action-btn {
+        padding: 0.5rem !important;
+        font-size: 0.85rem !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+    }
+    
+    /* تحسين معلومات الشركة */
+    .card h2 {
+        font-size: 1.25rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* تصغير الخطوط للشاشات الصغيرة */
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.1rem !important; }
+    
+    /* تحسين Modal للشاشات الصغيرة جداً */
+    .modal-content {
+        width: 98% !important;
+        padding: 1rem !important;
+        margin: 0.5rem !important;
+    }
+    
+    /* تحسين الأزرار في Modal */
+    .modal-footer .btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* تحسين الطباعة على الهاتف */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .no-print,
+    nav,
+    .nav-toggle,
+    .nav-actions,
+    button:not(.print-btn) {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #ddd !important;
+        background: white !important;
+        page-break-inside: avoid;
+    }
+}
+
+/* تحسين سلاسة التمرير */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* تحسينات خاصة لصفحة نقطة البيع (POS) على الهاتف */
+@media (max-width: 768px) {
+    /* تحسين ترتيب العناصر في POS */
+    .pos-grid > .card:last-child {
+        order: -1; /* عرض ملخص الفاتورة أولاً على الهاتف */
+    }
+    
+    /* تحسين أزرار العربة */
+    #checkoutBtn,
+    #clearCartBtn {
+        font-size: 1rem !important;
+        height: 48px !important;
+        margin-top: 0.75rem !important;
+    }
+    
+    /* تحسين حقول البحث */
+    #productSearch,
+    #barcodeSearch {
+        font-size: 16px !important;
+    }
+    
+    /* تحسين عرض عناصر العربة */
+    .cart-item {
+        padding: 0.75rem 0;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    /* تحسين أزرار الإجراءات في الجدول */
+    table .btn {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* إخفاء بعض الأعمدة على الشاشات الصغيرة جداً */
+    @media (max-width: 480px) {
+        .pos-grid > .card:first-child {
+            overflow-x: auto;
+        }
+    }
+}
+
+/* تحسين تجربة اللمس للأزرار */
+.btn,
+button,
+a,
+.action-btn {
+    -webkit-tap-highlight-color: rgba(0, 210, 255, 0.1);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* تحسين الأزرار عند اللمس */
+@media (hover: none) {
+    .btn:active,
+    button:active {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+}

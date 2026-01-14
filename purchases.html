@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المشتريات | أولاد الخواص</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html" class="active"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+            <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+                <i class="fas fa-upload"></i>
+                <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+            </label>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- إضافة فاتورة شراء جديدة -->
+        <div class="card animate-fade">
+            <div class="card-title"><i class="fas fa-plus-circle" style="color: var(--success);"></i> إضافة فاتورة شراء جديدة</div>
+            <form id="purchaseForm">
+                <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="input-group">
+                        <label>المورد</label>
+                        <select id="supplierSelect" required>
+                            <option value="">اختر المورد...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>رقم الفاتورة</label>
+                        <input type="text" id="invoiceNumber" required>
+                    </div>
+                    <div class="input-group">
+                        <label>تاريخ الشراء</label>
+                        <input type="date" id="purchaseDate" required>
+                    </div>
+                </div>
+
+                <!-- إضافة الأصناف للفاتورة -->
+                <div style="margin-top: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0; color: var(--primary-color);"><i class="fas fa-list"></i> أصناف الفاتورة</h3>
+                        <button type="button" class="btn btn-primary" onclick="addPurchaseItem()" style="padding: 5px 15px;">
+                            <i class="fas fa-plus"></i> إضافة صنف
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الصنف</th>
+                                    <th>الكمية</th>
+                                    <th>سعر الشراء</th>
+                                    <th>الإجمالي</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseItemsBody">
+                                <!-- سيتم إضافة الأصناف هنا -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                        <div></div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <strong>إجمالي الفاتورة:</strong>
+                                <span id="purchaseTotal" style="color: var(--primary-color); font-size: 1.2rem; font-weight: bold;">0.00 ج.م</span>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 0.5rem;">
+                                <label>المبلغ المدفوع</label>
+                                <input type="number" id="paidAmount" step="0.01" value="0" style="text-align: center;">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 2px solid var(--primary-color);">
+                                <strong>المتبقي (دين):</strong>
+                                <span id="remainingAmount" style="color: var(--danger); font-size: 1.1rem; font-weight: bold;">0.00 ج.م</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 1rem;">
+                    <label>ملاحظات</label>
+                    <textarea id="purchaseNotes" rows="2" placeholder="ملاحظات إضافية (اختياري)"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; font-size: 1.1rem;">
+                    <i class="fas fa-save"></i> حفظ فاتورة الشراء
+                </button>
+            </form>
+        </div>
+
+        <!-- سجل فواتير الشراء -->
+        <div class="card animate-fade" style="animation-delay: 0.1s;">
+            <div class="card-title"><i class="fas fa-history"></i> سجل فواتير الشراء</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>التاريخ</th>
+                            <th>المورد</th>
+                            <th>الإجمالي</th>
+                            <th>المدفوع</th>
+                            <th>المتبقي</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchasesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        let purchaseItems = [];
+        let products = [];
+        let suppliers = [];
+        let purchases = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            DB.checkAuth();
+            products = await DB.getProducts();
+            suppliers = await DB.getSuppliers();
+            purchases = await DB.getPurchases();
+
+            // تحميل قائمة الموردين
+            const supplierSelect = document.getElementById('supplierSelect');
+            suppliers.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = s.name;
+                supplierSelect.appendChild(option);
+            });
+
+            // تعيين تاريخ اليوم
+            document.getElementById('purchaseDate').valueAsDate = new Date();
+
+            // تحديث المبلغ المتبقي عند تغيير المدفوع
+            document.getElementById('paidAmount').addEventListener('input', updateRemaining);
+
+            // عرض فواتير الشراء
+            renderPurchases();
+        });
+
+        function addPurchaseItem() {
+            const tbody = document.getElementById('purchaseItemsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <select class="item-product" required style="width: 100%; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;">
+                        <option value="">اختر الصنف...</option>
+                        ${products.map(p => `<option value="${p.id}" data-name="${p.name}">${p.name}</option>`).join('')}
+                    </select>
+                </td>
+                <td><input type="number" class="item-qty" value="1" min="1" required style="width: 80px; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; text-align: center;"></td>
+                <td><input type="number" class="item-price" value="0" step="0.01" min="0" required style="width: 100px; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; text-align: center;"></td>
+                <td class="item-total" style="font-weight: bold; color: var(--success);">0.00</td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="this.closest('tr').remove(); calculateTotal();" style="padding: 5px 10px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+
+            // إضافة مستمعين للتحديث التلقائي
+            row.querySelector('.item-qty').addEventListener('input', calculateTotal);
+            row.querySelector('.item-price').addEventListener('input', calculateTotal);
+        }
+
+        function calculateTotal() {
+            const rows = document.querySelectorAll('#purchaseItemsBody tr');
+            let total = 0;
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const itemTotal = qty * price;
+                row.querySelector('.item-total').textContent = itemTotal.toFixed(2);
+                total += itemTotal;
+            });
+
+            document.getElementById('purchaseTotal').textContent = total.toFixed(2) + ' ج.م';
+            updateRemaining();
+        }
+
+        function updateRemaining() {
+            const total = parseFloat(document.getElementById('purchaseTotal').textContent) || 0;
+            const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const remaining = total - paid;
+            document.getElementById('remainingAmount').textContent = remaining.toFixed(2) + ' ج.م';
+        }
+
+        document.getElementById('purchaseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const rows = document.querySelectorAll('#purchaseItemsBody tr');
+            if (rows.length === 0) {
+                DB.showToast('يجب إضافة صنف واحد على الأقل', 'error');
+                return;
+            }
+
+            const items = [];
+            rows.forEach(row => {
+                const productId = parseInt(row.querySelector('.item-product').value);
+                const productName = row.querySelector('.item-product option:checked').dataset.name;
+                const qty = parseFloat(row.querySelector('.item-qty').value);
+                const price = parseFloat(row.querySelector('.item-price').value);
+
+                if (productId && qty > 0 && price >= 0) {
+                    items.push({ id: productId, name: productName, quantity: qty, purchasePrice: price });
+                }
+            });
+
+            const supplierId = parseInt(document.getElementById('supplierSelect').value);
+            const supplierName = document.getElementById('supplierSelect').options[document.getElementById('supplierSelect').selectedIndex].text;
+            const total = parseFloat(document.getElementById('purchaseTotal').textContent) || 0;
+            const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+
+            const purchase = {
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                date: document.getElementById('purchaseDate').value,
+                supplierId: supplierId,
+                supplierName: supplierName,
+                items: items,
+                total: total,
+                paid: paid,
+                remaining: total - paid,
+                notes: document.getElementById('purchaseNotes').value,
+                timestamp: new Date().toISOString()
+            };
+
+            await DB.savePurchase(purchase);
+            DB.showToast('تم حفظ فاتورة الشراء بنجاح');
+
+            // إعادة تعيين النموذج
+            document.getElementById('purchaseForm').reset();
+            document.getElementById('purchaseDate').valueAsDate = new Date();
+            document.getElementById('purchaseItemsBody').innerHTML = '';
+            document.getElementById('purchaseTotal').textContent = '0.00 ج.م';
+            document.getElementById('remainingAmount').textContent = '0.00 ج.م';
+
+            // إعادة تحميل البيانات
+            purchases = await DB.getPurchases();
+            renderPurchases();
+        });
+
+        function renderPurchases() {
+            const tbody = document.getElementById('purchasesTableBody');
+            tbody.innerHTML = '';
+
+            purchases.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(p => {
+                const tr = document.createElement('tr');
+                const status = p.remaining === 0 ? 'مدفوعة' : p.paid > 0 ? 'دفع جزئي' : 'غير مدفوعة';
+                const statusColor = p.remaining === 0 ? 'var(--success)' : p.paid > 0 ? 'var(--warning)' : 'var(--danger)';
+                
+                tr.innerHTML = `
+                    <td><strong>${p.invoiceNumber}</strong></td>
+                    <td>${new Date(p.date).toLocaleDateString('ar-EG')}</td>
+                    <td>${p.supplierName}</td>
+                    <td style="font-weight: bold;">${p.total.toFixed(2)} ج.م</td>
+                    <td style="color: var(--success);">${p.paid.toFixed(2)} ج.م</td>
+                    <td style="color: var(--danger); font-weight: bold;">${p.remaining.toFixed(2)} ج.م</td>
+                    <td><span style="color: ${statusColor}; font-weight: bold;">${status}</span></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewPurchaseDetails(${p.id})" style="padding: 5px 10px;" title="التفاصيل">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${p.remaining > 0 ? `<button class="btn btn-success" onclick="payPurchase(${p.id})" style="padding: 5px 10px;" title="تسديد">
+                            <i class="fas fa-hand-holding-dollar"></i>
+                        </button>` : ''}
+                        <button class="btn btn-danger" onclick="deletePurchase(${p.id})" style="padding: 5px 10px;" title="حذف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function viewPurchaseDetails(id) {
+            const purchase = purchases.find(p => p.id === id);
+            if (!purchase) return;
+
+            const itemsTable = purchase.items.map(item => 
+                `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.purchasePrice.toFixed(2)} ج.م</td>
+                    <td><strong>${(item.quantity * item.purchasePrice).toFixed(2)} ج.م</strong></td>
+                </tr>`
+            ).join('');
+
+            const details = `
+                <div style="text-align: right;">
+                    <p><strong>رقم الفاتورة:</strong> ${purchase.invoiceNumber}</p>
+                    <p><strong>التاريخ:</strong> ${new Date(purchase.date).toLocaleDateString('ar-EG')}</p>
+                    <p><strong>المورد:</strong> ${purchase.supplierName}</p>
+                    ${purchase.notes ? `<p><strong>ملاحظات:</strong> ${purchase.notes}</p>` : ''}
+                    
+                    <h4 style="margin-top: 1rem; color: var(--primary-color);">الأصناف:</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--primary-color);">
+                                <th style="padding: 8px;">الصنف</th>
+                                <th style="padding: 8px;">الكمية</th>
+                                <th style="padding: 8px;">السعر</th>
+                                <th style="padding: 8px;">الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody>${itemsTable}</tbody>
+                    </table>
+                    
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <p style="display: flex; justify-content: space-between;"><strong>الإجمالي:</strong> <span>${purchase.total.toFixed(2)} ج.م</span></p>
+                        <p style="display: flex; justify-content: space-between; color: var(--success);"><strong>المدفوع:</strong> <span>${purchase.paid.toFixed(2)} ج.م</span></p>
+                        <p style="display: flex; justify-content: space-between; color: var(--danger); font-size: 1.1rem;"><strong>المتبقي:</strong> <span>${purchase.remaining.toFixed(2)} ج.م</span></p>
+                    </div>
+                </div>
+            `;
+
+            await DB.confirm(details, 'تفاصيل فاتورة الشراء');
+        }
+
+        async function payPurchase(id) {
+            const purchase = purchases.find(p => p.id === id);
+            if (!purchase || purchase.remaining <= 0) return;
+
+            const amountInput = `
+                <div style="text-align: right;">
+                    <p><strong>المتبقي على الفاتورة:</strong> <span style="color: var(--danger); font-size: 1.2rem;">${purchase.remaining.toFixed(2)} ج.م</span></p>
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <label>المبلغ المدفوع:</label>
+                        <input type="number" id="payAmount" step="0.01" max="${purchase.remaining}" value="${purchase.remaining}" style="width: 100%; padding: 10px; font-size: 1.1rem; text-align: center;" autofocus>
+                    </div>
+                </div>
+            `;
+
+            const confirmed = await DB.confirm(amountInput, 'تسديد دفعة');
+            if (confirmed) {
+                const payAmount = parseFloat(document.getElementById('payAmount').value);
+                if (payAmount > 0 && payAmount <= purchase.remaining) {
+                    purchase.paid += payAmount;
+                    purchase.remaining -= payAmount;
+                    await DB.updatePurchase(purchase);
+                    DB.showToast('تم تسجيل الدفعة بنجاح');
+                    purchases = await DB.getPurchases();
+                    renderPurchases();
+                } else {
+                    DB.showToast('المبلغ غير صحيح', 'error');
+                }
+            }
+        }
+
+        async function deletePurchase(id) {
+            const confirmed = await DB.confirm('هل أنت متأكد من حذف هذه الفاتورة؟', 'تأكيد الحذف');
+            if (confirmed) {
+                await DB.deletePurchase(id);
+                DB.showToast('تم حذف الفاتورة');
+                purchases = await DB.getPurchases();
+                renderPurchases();
+            }
+        }
+
+        // إضافة صنف افتراضي عند تحميل الصفحة
+        setTimeout(() => {
+            addPurchaseItem();
+        }, 500);
+    </script>
+</body>
+</html>

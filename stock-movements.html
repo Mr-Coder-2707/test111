@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل حركة المخزون | أولاد الخواص</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+    <script src="libs/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+            <a href="stock-movements.html" class="active"><i class="fas fa-dolly"></i> حركة المخزون</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+            <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+                <i class="fas fa-upload"></i>
+                <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+            </label>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- فلتر البحث -->
+        <div class="card animate-fade">
+            <div class="card-title"><i class="fas fa-filter"></i> فلتر الحركات</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="input-group">
+                    <label>من تاريخ</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+                <div class="input-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+                <div class="input-group">
+                    <label>نوع الحركة</label>
+                    <select id="filterType">
+                        <option value="">الكل</option>
+                        <option value="وارد">وارد (مشتريات)</option>
+                        <option value="صادر">صادر (مبيعات)</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                    <button class="btn btn-primary" onclick="applyFilter()" style="flex: 1;">
+                        <i class="fas fa-search"></i> بحث
+                    </button>
+                    <button class="btn" onclick="resetFilter()" style="flex: 1; background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        <i class="fas fa-redo"></i> إعادة
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات سريعة -->
+        <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.1s;">
+                <small style="color: var(--text-gray); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-arrow-down" style="color: var(--success);"></i>
+                    إجمالي الوارد
+                </small>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--success); margin-top: 0.5rem;" id="totalIn">0</div>
+                <small style="opacity: 0.7;">قطعة</small>
+            </div>
+
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.2s;">
+                <small style="color: var(--text-gray); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-arrow-up" style="color: var(--danger);"></i>
+                    إجمالي الصادر
+                </small>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--danger); margin-top: 0.5rem;" id="totalOut">0</div>
+                <small style="opacity: 0.7;">قطعة</small>
+            </div>
+
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.3s; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                <small style="color: white; display: flex; align-items: center; gap: 0.5rem; opacity: 0.9;">
+                    <i class="fas fa-warehouse"></i>
+                    الرصيد الحالي
+                </small>
+                <div style="font-size: 2rem; font-weight: 800; color: white; margin-top: 0.5rem;" id="currentStock">0</div>
+                <small style="opacity: 0.9; color: white;">قطعة</small>
+            </div>
+        </div>
+
+        <!-- جدول الحركات -->
+        <div class="card animate-fade" style="animation-delay: 0.4s;">
+            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fas fa-list"></i> سجل حركة المخزون</span>
+                <button class="btn btn-primary" onclick="exportMovements()" style="padding: 5px 15px; font-size: 0.9rem;">
+                    <i class="fas fa-file-export"></i> تصدير Excel
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>النوع</th>
+                            <th>الصنف</th>
+                            <th>الكمية</th>
+                            <th>رقم الفاتورة</th>
+                            <th>التفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movementsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        let allMovements = [];
+        let filteredMovements = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            DB.checkAuth();
+            await loadMovements();
+            setDefaultDates();
+            applyFilter();
+        });
+
+        function setDefaultDates() {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+            document.getElementById('filterStartDate').value = firstDay;
+            document.getElementById('filterEndDate').value = lastDay;
+        }
+
+        async function loadMovements() {
+            const sales = await DB.getSales();
+            const purchases = await DB.getPurchases();
+            const products = await DB.getProducts();
+
+            allMovements = [];
+
+            // إضافة حركات المشتريات (وارد)
+            purchases.forEach(purchase => {
+                purchase.items.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    allMovements.push({
+                        date: purchase.date,
+                        timestamp: purchase.timestamp || purchase.date,
+                        type: 'وارد',
+                        productName: item.name || (product ? product.name : 'غير معروف'),
+                        quantity: item.quantity,
+                        invoiceNumber: purchase.invoiceNumber,
+                        details: `شراء من: ${purchase.supplierName}`
+                    });
+                });
+            });
+
+            // إضافة حركات المبيعات (صادر)
+            sales.forEach(sale => {
+                sale.items.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    allMovements.push({
+                        date: sale.date,
+                        timestamp: sale.timestamp || sale.date,
+                        type: 'صادر',
+                        productName: item.name || (product ? product.name : 'غير معروف'),
+                        quantity: item.quantity,
+                        invoiceNumber: sale.id || '--',
+                        details: sale.customerName ? `بيع لـ: ${sale.customerName}` : 'مبيعات عامة'
+                    });
+                });
+            });
+
+            // ترتيب حسب التاريخ (الأحدث أولاً)
+            allMovements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        function applyFilter() {
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const typeFilter = document.getElementById('filterType').value;
+
+            filteredMovements = allMovements.filter(m => {
+                const dateMatch = (!startDate || m.date >= startDate) && (!endDate || m.date <= endDate);
+                const typeMatch = !typeFilter || m.type === typeFilter;
+                return dateMatch && typeMatch;
+            });
+
+            renderMovements();
+            updateStats();
+        }
+
+        function resetFilter() {
+            document.getElementById('filterType').value = '';
+            setDefaultDates();
+            applyFilter();
+        }
+
+        function renderMovements() {
+            const tbody = document.getElementById('movementsTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredMovements.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; opacity: 0.7;">لا توجد حركات في هذه الفترة</td></tr>';
+                return;
+            }
+
+            filteredMovements.forEach(m => {
+                const tr = document.createElement('tr');
+                const typeColor = m.type === 'وارد' ? 'var(--success)' : 'var(--danger)';
+                const typeIcon = m.type === 'وارد' ? 'fa-arrow-down' : 'fa-arrow-up';
+                
+                tr.innerHTML = `
+                    <td>${new Date(m.date).toLocaleDateString('ar-EG')}</td>
+                    <td style="color: ${typeColor}; font-weight: bold;">
+                        <i class="fas ${typeIcon}"></i> ${m.type}
+                    </td>
+                    <td>${m.productName}</td>
+                    <td style="font-weight: bold; color: ${typeColor};">${m.quantity}</td>
+                    <td><code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px;">${m.invoiceNumber}</code></td>
+                    <td style="opacity: 0.8;">${m.details}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function updateStats() {
+            const products = await DB.getProducts();
+            
+            const totalIncoming = filteredMovements
+                .filter(m => m.type === 'وارد')
+                .reduce((sum, m) => sum + m.quantity, 0);
+            
+            const totalOutgoing = filteredMovements
+                .filter(m => m.type === 'صادر')
+                .reduce((sum, m) => sum + m.quantity, 0);
+            
+            const currentStockTotal = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+
+            document.getElementById('totalIn').textContent = totalIncoming;
+            document.getElementById('totalOut').textContent = totalOutgoing;
+            document.getElementById('currentStock').textContent = currentStockTotal;
+        }
+
+        function exportMovements() {
+            if (filteredMovements.length === 0) {
+                DB.showToast('لا توجد بيانات للتصدير', 'error');
+                return;
+            }
+
+            const data = [
+                ['سجل حركة المخزون - أولاد الخواص'],
+                ['الفترة من:', document.getElementById('filterStartDate').value, 'إلى:', document.getElementById('filterEndDate').value],
+                [],
+                ['التاريخ', 'النوع', 'الصنف', 'الكمية', 'رقم الفاتورة', 'التفاصيل']
+            ];
+
+            filteredMovements.forEach(m => {
+                data.push([
+                    new Date(m.date).toLocaleDateString('ar-EG'),
+                    m.type,
+                    m.productName,
+                    m.quantity,
+                    m.invoiceNumber,
+                    m.details
+                ]);
+            });
+
+            data.push([]);
+            data.push(['إجمالي الوارد', '', '', filteredMovements.filter(m => m.type === 'وارد').reduce((sum, m) => sum + m.quantity, 0)]);
+            data.push(['إجمالي الصادر', '', '', filteredMovements.filter(m => m.type === 'صادر').reduce((sum, m) => sum + m.quantity, 0)]);
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'حركة المخزون');
+            XLSX.writeFile(wb, `سجل_حركة_المخزون_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
+            DB.showToast('تم تصدير التقرير بنجاح');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام مبيعات أولاد الخواص | إدارة الأصناف</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+    <script src="libs/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo">
+            <i class="fas fa-faucet-drip"></i> أولاد الخواص
+        </div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html" class="active"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+            <a href="print-barcode.html"><i class="fas fa-barcode"></i> طباعة باركود</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn" onclick="DB.showLowStockModal()" title="النواقص" style="position: relative; background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="lowStockBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 0.6rem; align-items: center; justify-content: center;">0</span>
+            </button>
+            <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+            <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+                <i class="fas fa-upload"></i>
+                <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+            </label>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card animate-fade">
+            <div class="card-title" style="justify-content: space-between;">
+                <span>
+                    <i class="fas fa-plus-circle" style="color: var(--success);"></i>
+                    إضافة / تعديل صنف
+                </span>
+                <div class="grid-2" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button id="loadInitialData" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9rem; background: var(--primary-color); flex: 1; min-width: 120px;">
+                        <i class="fas fa-database"></i> تحميل البيانات
+                    </button>
+                    <button id="exportExcel" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9rem; background: var(--success); flex: 1; min-width: 120px;">
+                        <i class="fas fa-file-export"></i> تصدير إكسيل
+                    </button>
+                    <label for="excelImport" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9rem; background: var(--secondary-color); flex: 1; min-width: 120px; cursor: pointer;">
+                        <i class="fas fa-file-excel"></i> استيراد
+                        <input type="file" id="excelImport" accept=".xlsx, .xls" style="display: none;">
+                    </label>
+                    <button id="clearAllProducts" class="btn btn-danger" style="padding: 5px 15px; font-size: 0.9rem; flex: 1; min-width: 120px;">
+                        <i class="fas fa-trash-alt"></i> مسح
+                    </button>
+                </div>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="input-group">
+                        <label>اسم الصنف</label>
+                        <input type="text" id="pName" required placeholder="مثال: محبس زاوية 1/2">
+                    </div>
+                    <div class="input-group">
+                        <label>التصنيف</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="pCategory" style="flex: 1;">
+                                <!-- Categories populated by JS -->
+                            </select>
+                            <button type="button" class="btn btn-primary" id="addCategoryBtn" style="padding: 5px 12px; font-size: 0.8rem;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>سعر البيع (ج.م)</label>
+                        <input type="number" id="pPrice" required step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>سعر التكلفة (ج.م)</label>
+                        <input type="number" id="pCost" required step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>الكمية المتوفرة</label>
+                        <input type="number" id="pStock" required min="0">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">
+                        <i class="fas fa-save"></i> حفظ الصنف
+                    </button>
+                    <button type="button" id="cancelEdit" class="btn btn-danger" style="flex: 1; display: none;">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay: 0.1s;">
+            <div class="card-title">
+                <i class="fas fa-list" style="color: var(--primary-color);"></i>
+                قائمة الأصناف الحالية
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الصنف</th>
+                            <th>التصنيف</th>
+                            <th>سعر البيع</th>
+                            <th>التكلفة</th>
+                            <th>المخزون</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Products will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/company-info.js"></script>
+    <script src="js/initial_data.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/products.js"></script>
+</body>
+</html>

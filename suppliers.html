@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام مبيعات أولاد الخواص | الموردين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html" class="active"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card animate-fade">
+            <div class="card-title"><i class="fas fa-plus-circle" style="color: var(--success);"></i> إضافة مورد جديد</div>
+            <form id="supplierForm">
+                <input type="hidden" id="supplierId">
+                <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="input-group"><label>اسم المورد / الشركة</label><input type="text" id="sName" required></div>
+                    <div class="input-group"><label>رقم الهاتف</label><input type="text" id="sPhone"></div>
+                    <div class="input-group"><label>العنوان</label><input type="text" id="sAddress"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 200px;"><i class="fas fa-save"></i> حفظ البيانات</button>
+            </form>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay: 0.1s;">
+            <div class="card-title"><i class="fas fa-list"></i> قائمة الموردين والمديونيات</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم المورد</th>
+                            <th>الهاتف</th>
+                            <th>العنوان</th>
+                            <th>المديونية (ج.م)</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplierTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            DB.checkAuth();
+            const form = document.getElementById('supplierForm');
+            const tableBody = document.getElementById('supplierTableBody');
+            let suppliers = await DB.getSuppliers();
+
+            function render() {
+                tableBody.innerHTML = '';
+                suppliers.forEach(s => {
+                    const balance = s.balance || 0;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${s.name}</td>
+                        <td>${s.phone || '--'}</td>
+                        <td>${s.address || '--'}</td>
+                        <td style="color: ${balance > 0 ? 'var(--danger)' : 'var(--success)'}; font-weight: bold;">${balance.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editSupplier(${s.id})" style="padding: 5px 10px; display: inline-flex;" title="تعديل"><i class="fas fa-edit"></i></button>
+                            ${balance > 0 ? `<button class="btn btn-success" onclick="paySupplier(${s.id})" style="padding: 5px 10px; display: inline-flex;" title="تسديد دين"><i class="fas fa-hand-holding-dollar"></i></button>` : ''}
+                            <button class="btn btn-danger" onclick="deleteSupplier(${s.id})" style="padding: 5px 10px; display: inline-flex;" title="حذف"><i class="fas fa-trash"></i></button>
+                        </td>`;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('supplierId').value ? parseInt(document.getElementById('supplierId').value) : null;
+                const data = { id, name: document.getElementById('sName').value, phone: document.getElementById('sPhone').value, address: document.getElementById('sAddress').value };
+                
+                await DB.saveSupplier(data);
+                DB.showToast(id ? 'تم تحديث بيانات المورد' : 'تم إضافة المورد بنجاح');
+                
+                suppliers = await DB.getSuppliers();
+                form.reset();
+                document.getElementById('supplierId').value = '';
+                render();
+            };
+
+            window.editSupplier = (id) => {
+                const s = suppliers.find(x => x.id === id);
+                document.getElementById('supplierId').value = s.id;
+                document.getElementById('sName').value = s.name;
+                document.getElementById('sPhone').value = s.phone;
+                document.getElementById('sAddress').value = s.address;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            window.deleteSupplier = async (id) => {
+                if(await DB.confirm('هل أنت متأكد من حذف هذا المورد؟')) {
+                    await DB.deleteSupplier(id);
+                    suppliers = await DB.getSuppliers();
+                    render();
+                    DB.showToast('تم حذف المورد', 'error');
+                }
+            };
+
+            window.paySupplier = async (id) => {
+                const supplier = suppliers.find(s => s.id === id);
+                if (!supplier || !supplier.balance || supplier.balance <= 0) return;
+
+                const paymentInput = `
+                    <div style="text-align: right;">
+                        <p><strong>المورد:</strong> ${supplier.name}</p>
+                        <p><strong>المديونية الحالية:</strong> <span style="color: var(--danger); font-size: 1.2rem;">${supplier.balance.toFixed(2)} ج.م</span></p>
+                        <div class="input-group" style="margin-top: 1rem;">
+                            <label>المبلغ المدفوع:</label>
+                            <input type="number" id="paymentAmount" step="0.01" max="${supplier.balance}" value="${supplier.balance}" style="width: 100%; padding: 10px; font-size: 1.1rem; text-align: center;" autofocus>
+                        </div>
+                    </div>
+                `;
+
+                const confirmed = await DB.confirm(paymentInput, 'تسديد دين المورد');
+                if (confirmed) {
+                    const amount = parseFloat(document.getElementById('paymentAmount').value);
+                    if (amount > 0 && amount <= supplier.balance) {
+                        supplier.balance -= amount;
+                        await DB.saveSupplier(supplier);
+                        
+                        // Save payment record
+                        await DB.saveExpense({
+                            date: new Date().toISOString().split('T')[0],
+                            category: 'تسديد ديون موردين',
+                            amount: amount,
+                            description: `تسديد دين للمورد: ${supplier.name}`,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        suppliers = await DB.getSuppliers();
+                        render();
+                        DB.showToast('تم تسجيل الدفعة بنجاح');
+                    } else {
+                        DB.showToast('المبلغ غير صحيح', 'error');
+                    }
+                }
+            };
+
+            render();
+        });
+    </script>
+</body>
+</html>

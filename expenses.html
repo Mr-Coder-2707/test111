@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المصروفات | أولاد الخواص</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html" class="active"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card animate-fade">
+            <div class="card-title"><i class="fas fa-plus-circle" style="color: var(--danger);"></i> تسجيل مصروف جديد</div>
+            <form id="expenseForm">
+                <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="input-group">
+                        <label>وصف المصروف</label>
+                        <input type="text" id="expDesc" required placeholder="مثال: فاتورة كهرباء، غداء عمال...">
+                    </div>
+                    <div class="input-group">
+                        <label>المبلغ (ج.م)</label>
+                        <input type="number" id="expAmount" required step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>التاريخ</label>
+                        <input type="date" id="expDate" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-save"></i> حفظ المصروف
+                </button>
+            </form>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay: 0.1s">
+            <div class="card-title"><i class="fas fa-list"></i> سجل المصروفات</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الوصف</th>
+                            <th>المبلغ</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            DB.checkAuth();
+            const form = document.getElementById('expenseForm');
+            const tbody = document.getElementById('expenseTableBody');
+            document.getElementById('expDate').valueAsDate = new Date();
+
+            let expenses = await DB.getExpenses();
+
+            function render() {
+                tbody.innerHTML = '';
+                expenses.sort((a,b) => b.id - a.id).forEach(exp => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${new Date(exp.date).toLocaleDateString('ar-EG')}</td>
+                        <td>${exp.description}</td>
+                        <td style="color: var(--danger); font-weight: bold;">${exp.amount.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deleteExp(${exp.id})" style="padding: 5px 10px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const exp = {
+                    description: document.getElementById('expDesc').value,
+                    amount: parseFloat(document.getElementById('expAmount').value),
+                    date: document.getElementById('expDate').value
+                };
+                await DB.saveExpense(exp);
+                DB.showToast('تم حفظ المصروف');
+                form.reset();
+                document.getElementById('expDate').valueAsDate = new Date();
+                expenses = await DB.getExpenses();
+                render();
+            };
+
+            window.deleteExp = async (id) => {
+                if (await DB.confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+                    await DB.deleteExpense(id);
+                    expenses = await DB.getExpenses();
+                    render();
+                    DB.showToast('تم الحذف', 'error');
+                }
+            };
+
+            render();
+        });
+    </script>
+</body>
+</html>

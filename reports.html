@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام مبيعات أولاد الخواص | التقارير</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+    <script src="libs/xlsx.full.min.js"></script>
+    <script src="libs/chart.min.js"></script>
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo">
+            <i class="fas fa-faucet-drip"></i> أولاد الخواص
+        </div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html" class="active"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+            <a href="stock-movements.html"><i class="fas fa-dolly"></i> حركة المخزون</a>
+        </div>
+            <a href="reports.html" class="active"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+            <a href="stock-movements.html"><i class="fas fa-dolly"></i> حركة المخزون</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+            <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+                <i class="fas fa-upload"></i>
+                <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+            </label>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats Row -->
+        <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem;">
+                <small style="color: var(--text-gray);">إجمالي مبيعات اليوم</small>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);" id="dailyTotal">0.00</div>
+            </div>
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.1s;">
+                <small style="color: var(--text-gray);">صافي ربح اليوم</small>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);" id="dailyProfit">0.00</div>
+            </div>
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.2s;">
+                <small style="color: var(--text-gray);">عدد الفواتير</small>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="invoiceCount">0</div>
+            </div>
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.3s;">
+                <small style="color: var(--text-gray);">الأكثر مبيعاً</small>
+                <div style="font-size: 1.1rem; font-weight: 700; color: var(--warning);" id="topProduct">--</div>
+            </div>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay: 0.4s; height: 350px;">
+            <div class="card-title"><i class="fas fa-chart-area"></i> إحصائيات المبيعات</div>
+            <canvas id="salesChart"></canvas>
+        </div>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay: 0.3s;">
+            <div class="card-title" style="justify-content: space-between;">
+                <span>
+                    <i class="fas fa-history" style="color: var(--secondary-color);"></i>
+                    سجل المبيعات
+                </span>
+                <button id="exportSalesReport" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9rem; background: var(--success);">
+                    <i class="fas fa-file-export"></i> تصدير التقرير
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>التاريخ</th>
+                            <th>العميل</th>
+                            <th>الأصناف</th>
+                            <th>الإجمالي</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <!-- Sales will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Invoice Details (Simple Alert style or custom) -->
+
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

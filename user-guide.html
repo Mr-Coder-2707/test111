@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل الاستخدام - نظام نقاط البيع</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+            border-right: 5px solid #667eea;
+            padding-right: 15px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        ul {
+            line-height: 1.8;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e83e8c;
+            font-weight: bold;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 دليل استخدام نظام نقاط البيع للسباكة</h1>
+        
+        <div class="success">
+            <strong>✅ تم إصلاح مشكلة حفظ البيانات!</strong>
+            <p>الآن جميع التغييرات تُحفظ تلقائياً ولن تُحذف عند إعادة تحميل الصفحة أو الضغط على Ctrl+F5</p>
+        </div>
+
+        <h2>📋 خطوات البدء السريع</h2>
+        
+        <div class="step">
+            <strong>1️⃣ تسجيل الدخول</strong>
+            <ul>
+                <li>افتح صفحة <code>login.html</code></li>
+                <li>استخدم: <code>admin</code> / <code>123</code> للوصول الكامل</li>
+                <li>أو: <code>cashier</code> / <code>123</code> للكاشير فقط</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <strong>2️⃣ تحميل المنتجات</strong>
+            <ul>
+                <li>اذهب إلى صفحة "الأصناف"</li>
+                <li>اضغط على زر <code>تحميل البيانات</code> (أزرق)</li>
+                <li>سيتم تحميل جميع المنتجات من ملف initial_data.js</li>
+                <li>البيانات ستُحفظ تلقائياً في المتصفح</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <strong>3️⃣ البدء في البيع</strong>
+            <ul>
+                <li>اذهب إلى صفحة "المبيعات" (الصفحة الرئيسية)</li>
+                <li>ابحث عن المنتج بالاسم أو الباركود</li>
+                <li>أضف المنتجات للسلة</li>
+                <li>اضغط "إتمام عملية البيع"</li>
+            </ul>
+        </div>
+
+        <h2>💾 حفظ البيانات</h2>
+        
+        <div class="info">
+            <strong>📌 معلومات هامة عن حفظ البيانات:</strong>
+            <ul>
+                <li>✔️ جميع التعديلات تُحفظ <strong>تلقائياً</strong> في localStorage</li>
+                <li>✔️ البيانات <strong>لن تُحذف</strong> عند إعادة تحميل الصفحة</li>
+                <li>✔️ البيانات الأولية تُحمل <strong>مرة واحدة فقط</strong></li>
+                <li>✔️ لن تتكرر المنتجات عند إعادة فتح النظام</li>
+            </ul>
+        </div>
+
+        <h2>🔄 النسخ الاحتياطي والاستعادة</h2>
+        
+        <div class="step">
+            <strong>💾 عمل نسخة احتياطية:</strong>
+            <ul>
+                <li>اضغط على أيقونة التحميل (⬇️) في أعلى الصفحة</li>
+                <li>سيتم تحميل ملف JSON يحتوي على جميع البيانات</li>
+                <li>احفظ هذا الملف في مكان آمن</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <strong>📤 استعادة نسخة احتياطية:</strong>
+            <ul>
+                <li>اضغط على أيقونة الرفع (⬆️)</li>
+                <li>اختر ملف النسخة الاحتياطية</li>
+                <li>سيتم استعادة جميع البيانات تلقائياً</li>
+            </ul>
+        </div>
+
+        <h2>⚠️ تحذيرات مهمة</h2>
+        
+        <div class="warning">
+            <strong>⚠️ تنبيهات هامة:</strong>
+            <ul>
+                <li><strong>لا تمسح بيانات المتصفح</strong> - ستفقد جميع البيانات!</li>
+                <li><strong>زر "مسح"</strong> في صفحة الأصناف سيحذف جميع المنتجات نهائياً</li>
+                <li><strong>النسخ الاحتياطي</strong> - يُنصح بعمل نسخة احتياطية يومياً</li>
+                <li><strong>المتصفحات المختلفة</strong> - لكل متصفح بيانات منفصلة</li>
+            </ul>
+        </div>
+
+        <h2>🛠️ حل المشاكل</h2>
+        
+        <div class="step">
+            <strong>🔍 إذا لم تظهر البيانات:</strong>
+            <ol>
+                <li>تأكد من أنك حمّلت البيانات باستخدام زر "تحميل البيانات"</li>
+                <li>افتح أدوات المطور (F12) وتحقق من Console</li>
+                <li>تأكد من أن المتصفح يسمح بـ localStorage</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <strong>🔄 إذا حُذفت البيانات بعد إعادة التحميل:</strong>
+            <ol>
+                <li>تأكد من أنك لم تمسح بيانات المتصفح</li>
+                <li>جرب استعادة نسخة احتياطية</li>
+                <li>تأكد من أن localStorage مُفعّل في المتصفح</li>
+            </ol>
+        </div>
+
+        <h2>📊 مميزات النظام</h2>
+        
+        <ul>
+            <li>✅ نظام مبيعات كامل مع الباركود</li>
+            <li>✅ إدارة المخزون التلقائية</li>
+            <li>✅ تقارير المبيعات والأرباح</li>
+            <li>✅ إدارة الموردين والعملاء</li>
+            <li>✅ تصدير واستيراد من Excel</li>
+            <li>✅ نظام المستخدمين (مدير/كاشير)</li>
+            <li>✅ واجهة عربية كاملة</li>
+        </ul>
+
+        <div class="success" style="text-align: center; margin-top: 40px;">
+            <h3>🎉 جاهز للاستخدام!</h3>
+            <p>النظام الآن جاهز ويحفظ جميع البيانات تلقائياً</p>
+            <a href="login.html" class="btn">ابدأ الاستخدام</a>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #eee;">
+        
+        <div style="text-align: center; color: #999; font-size: 0.9em;">
+            <p>نظام نقاط البيع للسباكة - 2026</p>
+            <p>للدعم الفني، راجع ملف README_AR.md</p>
+        </div>
+    </div>
+</body>
+</html>

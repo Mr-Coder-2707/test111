@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام مبيعات أولاد الخواص | الكاشير</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="libs/fontawesome.min.css" />
+  </head>
+  <body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+      <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+      <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+      <div class="nav-links">
+        <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html" class="active"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html"><i class="fas fa-balance-scale"></i> الأرباح</a>
+      </div>
+      <div class="nav-actions">
+          <button class="btn" onclick="DB.showLowStockModal()" title="النواقص" style="position: relative; background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="lowStockBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 0.6rem; align-items: center; justify-content: center;">0</span>
+          </button>
+          <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+          <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+              <i class="fas fa-upload"></i>
+              <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+          </label>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="pos-grid">
+        <!-- Left Side: Order List -->
+        <div class="card animate-fade">
+          <div class="card-title">
+            <i
+              class="fas fa-shopping-cart"
+              style="color: var(--primary-color)"
+            ></i>
+            الفاتورة الحالية
+          </div>
+
+          <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="input-group" style="position: relative">
+                <label>البحث عن صنف بالاسم</label>
+                <input
+                  type="text"
+                  id="productSearch"
+                  placeholder="ابحث بالاسم هنا..."
+                  autocomplete="off"
+                />
+                <div id="searchResults" class="search-results"></div>
+              </div>
+              <div class="input-group">
+                <label>بحث بالباركود</label>
+                <input type="text" id="barcodeSearch" placeholder="اسحب الباركود هنا..." />
+              </div>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الصنف</th>
+                  <th>السعر</th>
+                  <th>الكمية</th>
+                  <th>الإجمالي</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="cartTableBody">
+                <!-- Items will be added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Side: Summary & Payment -->
+        <div class="card animate-fade" style="animation-delay: 0.1s">
+          <div class="card-title">
+            <i class="fas fa-receipt" style="color: var(--secondary-color)"></i>
+            ملخص الفاتورة
+          </div>
+
+          <div class="total-section">
+            <div class="total-row">
+              <span>إجمالي الأصناف:</span>
+              <span id="itemsCount">0</span>
+            </div>
+            <div class="total-row">
+              <span>الضريبة (0%):</span>
+              <span>0.00</span>
+            </div>
+            <div class="total-row" style="margin-top: 1.5rem">
+              <span style="font-weight: 700">المجموع النهائي:</span>
+              <div class="total-amount">
+                <span id="grandTotal">0.00</span>
+                <small style="font-size: 1rem; color: var(--text-gray)"
+                  >ج.م</small
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+              <div class="input-group">
+                <label>اسم العميل</label>
+                <input type="text" id="customerName" placeholder="عميل نقدي" />
+              </div>
+              <div class="input-group">
+                <label>طريقة الدفع</label>
+                <select id="paymentType">
+                    <option value="cash">نقدي</option>
+                    <option value="debt">آجل (دين)</option>
+                </select>
+              </div>
+          </div>
+
+          <button
+            class="btn btn-primary"
+            id="checkoutBtn"
+            style="
+              width: 100%;
+              height: 60px;
+              font-size: 1.2rem;
+              margin-top: 1rem;
+            "
+          >
+            <i class="fas fa-check-circle"></i> إتمام عملية البيع
+          </button>
+
+          <button
+            class="btn btn-danger"
+            id="clearCartBtn"
+            style="width: 100%; margin-top: 1rem"
+          >
+            <i class="fas fa-trash"></i> إلغاء الفاتورة
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/company-info.js"></script>
+    <script src="js/initial_data.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/sales.js"></script>
+  </body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير الأرباح والخسائر | أولاد الخواص</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="libs/fontawesome.min.css">
+    <script src="libs/xlsx.full.min.js"></script>
+    <script src="libs/chart.min.js"></script>
+</head>
+<body>
+    <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
+    <nav>
+        <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
+        <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
+        <div class="nav-links">
+            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
+            <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
+            <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
+            <a href="purchases.html"><i class="fas fa-cart-shopping"></i> المشتريات</a>
+            <a href="expenses.html"><i class="fas fa-money-bill-wave"></i> المصروفات</a>
+            <a href="suppliers.html"><i class="fas fa-truck-field"></i> الموردين</a>
+            <a href="customers.html"><i class="fas fa-users-gear"></i> العملاء</a>
+            <a href="reports.html"><i class="fas fa-chart-line"></i> التقارير</a>
+            <a href="profit-loss.html" class="active"><i class="fas fa-balance-scale"></i> الأرباح</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn" onclick="DB.backup()" title="نسخة احتياطية" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fas fa-download"></i></button>
+            <label class="btn" title="استعادة بيانات" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); cursor: pointer;">
+                <i class="fas fa-upload"></i>
+                <input type="file" style="display: none;" onchange="DB.restore(this.files[0])">
+            </label>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- فلتر التاريخ -->
+        <div class="card animate-fade">
+            <div class="card-title"><i class="fas fa-filter"></i> فلتر الفترة الزمنية</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                <div class="input-group">
+                    <label>من تاريخ</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="input-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                    <button class="btn btn-primary" onclick="calculateProfitLoss()" style="flex: 1;">
+                        <i class="fas fa-calculator"></i> احسب
+                    </button>
+                    <button class="btn" onclick="setToday()" style="flex: 1; background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                        اليوم
+                    </button>
+                    <button class="btn" onclick="setThisMonth()" style="flex: 1; background: rgba(59, 130, 246, 0.1); color: var(--primary-color);">
+                        الشهر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ملخص مالي سريع -->
+        <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.1s;">
+                <small style="color: var(--text-gray); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-arrow-up" style="color: var(--success);"></i>
+                    إجمالي المبيعات
+                </small>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--success); margin-top: 0.5rem;" id="totalRevenue">0.00</div>
+                <small style="opacity: 0.7;">ج.م</small>
+            </div>
+
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.2s;">
+                <small style="color: var(--text-gray); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-arrow-down" style="color: var(--danger);"></i>
+                    تكلفة المشتريات
+                </small>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--danger); margin-top: 0.5rem;" id="totalPurchases">0.00</div>
+                <small style="opacity: 0.7;">ج.م</small>
+            </div>
+
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.3s;">
+                <small style="color: var(--text-gray); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-receipt" style="color: var(--warning);"></i>
+                    المصروفات
+                </small>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--warning); margin-top: 0.5rem;" id="totalExpenses">0.00</div>
+                <small style="opacity: 0.7;">ج.م</small>
+            </div>
+
+            <div class="card animate-fade" style="margin-bottom: 0; padding: 1.5rem; animation-delay: 0.4s; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                <small style="color: white; display: flex; align-items: center; gap: 0.5rem; opacity: 0.9;">
+                    <i class="fas fa-chart-line"></i>
+                    صافي الربح
+                </small>
+                <div style="font-size: 2rem; font-weight: 800; color: white; margin-top: 0.5rem;" id="netProfit">0.00</div>
+                <small style="opacity: 0.9; color: white;">ج.م</small>
+            </div>
+        </div>
+
+        <!-- تفاصيل الحسابات -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+            <!-- الإيرادات -->
+            <div class="card animate-fade" style="animation-delay: 0.5s;">
+                <div class="card-title" style="color: var(--success);">
+                    <i class="fas fa-money-bill-trend-up"></i> الإيرادات
+                </div>
+                <div style="padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px; margin-bottom: 0.5rem;">
+                        <span>إجمالي المبيعات:</span>
+                        <strong id="revenueSales" style="color: var(--success);">0.00 ج.م</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px; margin-bottom: 0.5rem;">
+                        <span>مبيعات نقدية:</span>
+                        <strong id="cashSales" style="color: var(--success);">0.00 ج.م</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px;">
+                        <span>مبيعات آجلة:</span>
+                        <strong id="creditSales" style="color: var(--warning);">0.00 ج.م</strong>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--success); display: flex; justify-content: space-between;">
+                        <strong>إجمالي الإيرادات:</strong>
+                        <strong id="totalRevenueDetails" style="font-size: 1.2rem; color: var(--success);">0.00 ج.م</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المصروفات -->
+            <div class="card animate-fade" style="animation-delay: 0.6s;">
+                <div class="card-title" style="color: var(--danger);">
+                    <i class="fas fa-money-bill-transfer"></i> المصروفات
+                </div>
+                <div style="padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(239, 68, 68, 0.05); border-radius: 6px; margin-bottom: 0.5rem;">
+                        <span>تكلفة المشتريات:</span>
+                        <strong id="costPurchases" style="color: var(--danger);">0.00 ج.م</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(239, 68, 68, 0.05); border-radius: 6px; margin-bottom: 0.5rem;">
+                        <span>مصروفات أخرى:</span>
+                        <strong id="otherExpenses" style="color: var(--danger);">0.00 ج.م</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(239, 68, 68, 0.05); border-radius: 6px;">
+                        <span>تكلفة البضاعة المباعة:</span>
+                        <strong id="cogs" style="color: var(--danger);">0.00 ج.م</strong>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--danger); display: flex; justify-content: space-between;">
+                        <strong>إجمالي المصروفات:</strong>
+                        <strong id="totalExpensesDetails" style="font-size: 1.2rem; color: var(--danger);">0.00 ج.م</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الرسم البياني -->
+        <div class="card animate-fade" style="animation-delay: 0.7s; margin-top: 2rem;">
+            <div class="card-title"><i class="fas fa-chart-bar"></i> المقارنة التفصيلية</div>
+            <div style="height: 350px; padding: 1rem;">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+
+        <!-- تصدير التقرير -->
+        <div class="card animate-fade" style="animation-delay: 0.8s;">
+            <button class="btn btn-primary" onclick="exportProfitLoss()" style="width: 100%; font-size: 1.1rem;">
+                <i class="fas fa-file-export"></i> تصدير تقرير الأرباح والخسائر (Excel)
+            </button>
+        </div>
+    </div>
+
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        let reportData = {};
+        let chart = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            DB.checkAuth();
+            setThisMonth();
+            await calculateProfitLoss();
+        });
+
+        function setToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+        }
+
+        function setThisMonth() {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+            document.getElementById('startDate').value = firstDay;
+            document.getElementById('endDate').value = lastDay;
+        }
+
+        async function calculateProfitLoss() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                DB.showToast('يرجى اختيار فترة زمنية', 'error');
+                return;
+            }
+
+            const sales = await DB.getSales();
+            const purchases = await DB.getPurchases();
+            const expenses = await DB.getExpenses();
+            const products = await DB.getProducts();
+
+            // فلترة البيانات حسب الفترة
+            const filteredSales = sales.filter(s => s.date >= startDate && s.date <= endDate);
+            const filteredPurchases = purchases.filter(p => p.date >= startDate && p.date <= endDate);
+            const filteredExpenses = expenses.filter(e => e.date >= startDate && e.date <= endDate);
+
+            // حساب الإيرادات
+            const totalSalesRevenue = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const cashSalesAmount = filteredSales.filter(s => s.paymentType === 'نقدي').reduce((sum, s) => sum + s.total, 0);
+            const creditSalesAmount = filteredSales.filter(s => s.paymentType === 'آجل').reduce((sum, s) => sum + s.total, 0);
+
+            // حساب تكلفة البضاعة المباعة (COGS)
+            let cogs = 0;
+            filteredSales.forEach(sale => {
+                sale.items.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (product && product.purchasePrice) {
+                        cogs += product.purchasePrice * item.quantity;
+                    }
+                });
+            });
+
+            // حساب المشتريات
+            const totalPurchasesAmount = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
+
+            // حساب المصروفات الأخرى
+            const otherExpensesAmount = filteredExpenses
+                .filter(e => e.category !== 'تسديد ديون موردين')
+                .reduce((sum, e) => sum + e.amount, 0);
+
+            // إجمالي المصروفات
+            const totalExpensesAmount = cogs + otherExpensesAmount;
+
+            // صافي الربح
+            const netProfitAmount = totalSalesRevenue - totalExpensesAmount;
+
+            // حفظ البيانات للتصدير
+            reportData = {
+                period: { start: startDate, end: endDate },
+                revenue: {
+                    total: totalSalesRevenue,
+                    cash: cashSalesAmount,
+                    credit: creditSalesAmount
+                },
+                expenses: {
+                    purchases: totalPurchasesAmount,
+                    cogs: cogs,
+                    other: otherExpensesAmount,
+                    total: totalExpensesAmount
+                },
+                profit: netProfitAmount
+            };
+
+            // تحديث الواجهة
+            document.getElementById('totalRevenue').textContent = totalSalesRevenue.toFixed(2);
+            document.getElementById('totalPurchases').textContent = totalPurchasesAmount.toFixed(2);
+            document.getElementById('totalExpenses').textContent = otherExpensesAmount.toFixed(2);
+            document.getElementById('netProfit').textContent = netProfitAmount.toFixed(2);
+
+            document.getElementById('revenueSales').textContent = totalSalesRevenue.toFixed(2) + ' ج.م';
+            document.getElementById('cashSales').textContent = cashSalesAmount.toFixed(2) + ' ج.م';
+            document.getElementById('creditSales').textContent = creditSalesAmount.toFixed(2) + ' ج.م';
+            document.getElementById('totalRevenueDetails').textContent = totalSalesRevenue.toFixed(2) + ' ج.م';
+
+            document.getElementById('costPurchases').textContent = totalPurchasesAmount.toFixed(2) + ' ج.م';
+            document.getElementById('otherExpenses').textContent = otherExpensesAmount.toFixed(2) + ' ج.م';
+            document.getElementById('cogs').textContent = cogs.toFixed(2) + ' ج.م';
+            document.getElementById('totalExpensesDetails').textContent = totalExpensesAmount.toFixed(2) + ' ج.م';
+
+            // تلوين صافي الربح
+            const netProfitEl = document.getElementById('netProfit');
+            if (netProfitAmount < 0) {
+                netProfitEl.parentElement.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            } else {
+                netProfitEl.parentElement.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+            }
+
+            // رسم البياني
+            updateChart(totalSalesRevenue, totalExpensesAmount, netProfitAmount);
+        }
+
+        function updateChart(revenue, expenses, profit) {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['الإيرادات', 'المصروفات', 'صافي الربح'],
+                    datasets: [{
+                        label: 'المبلغ (ج.م)',
+                        data: [revenue, expenses, profit],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.6)',
+                            'rgba(239, 68, 68, 0.6)',
+                            profit >= 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgb(16, 185, 129)',
+                            'rgb(239, 68, 68)',
+                            profit >= 0 ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.parsed.y.toFixed(2) + ' ج.م'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => value.toFixed(0) + ' ج.م'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportProfitLoss() {
+            if (!reportData.revenue) {
+                DB.showToast('قم بحساب التقرير أولاً', 'error');
+                return;
+            }
+
+            const data = [
+                ['تقرير الأرباح والخسائر - أولاد الخواص'],
+                ['الفترة من:', reportData.period.start, 'إلى:', reportData.period.end],
+                [],
+                ['الإيرادات', ''],
+                ['إجمالي المبيعات', reportData.revenue.total.toFixed(2)],
+                ['مبيعات نقدية', reportData.revenue.cash.toFixed(2)],
+                ['مبيعات آجلة', reportData.revenue.credit.toFixed(2)],
+                ['إجمالي الإيرادات', reportData.revenue.total.toFixed(2)],
+                [],
+                ['المصروفات', ''],
+                ['تكلفة المشتريات', reportData.expenses.purchases.toFixed(2)],
+                ['تكلفة البضاعة المباعة', reportData.expenses.cogs.toFixed(2)],
+                ['مصروفات أخرى', reportData.expenses.other.toFixed(2)],
+                ['إجمالي المصروفات', reportData.expenses.total.toFixed(2)],
+                [],
+                ['صافي الربح', reportData.profit.toFixed(2)]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'الأرباح والخسائر');
+            XLSX.writeFile(wb, `تقرير_الأرباح_${reportData.period.start}_${reportData.period.end}.xlsx`);
+            DB.showToast('تم تصدير التقرير بنجاح');
+        }
+    </script>
+</body>
+</html>
