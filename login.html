@@ -115,14 +115,14 @@
     <div class="login-card card animate-fade">
         <div class="login-logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
         <h2 style="margin-bottom: 2rem;">تسجيل الدخول للنظام</h2>
-        <form id="loginForm">
+        <form id="loginForm" autocomplete="off">
             <div class="input-group">
                 <label>اسم المستخدم</label>
-                <input type="text" id="username" required placeholder="ادخل اسم المستخدم">
+                <input type="text" id="username" name="username" required placeholder="ادخل اسم المستخدم" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
             </div>
             <div class="input-group">
                 <label>كلمة المرور</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <input type="password" id="password" name="password" required placeholder="••••••••" autocomplete="off">
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; height: 50px; font-size: 1.1rem;">
                 <i class="fas fa-sign-in-alt"></i> دخول
@@ -147,8 +147,17 @@
     <script>
         document.getElementById('loginForm').onsubmit = (e) => {
             e.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+            
+            // إزالة المسافات الزائدة من البداية والنهاية
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            
+            // تحديث القيم في الحقول بعد إزالة المسافات
+            document.getElementById('username').value = u;
+            document.getElementById('password').value = p;
+            
+            console.log('Username:', u, 'Length:', u.length);
+            console.log('Password:', p, 'Length:', p.length);
             
             if ((u === 'admin' && p === '123') || (u === 'cashier' && p === '123')) {
                 const user = {
@@ -161,8 +170,19 @@
                 setTimeout(() => location.href = 'dashboard.html', 1000);
             } else {
                 DB.showToast('اسم المستخدم أو كلمة المرور خطأ!', 'error');
+                console.error('Login failed - Username or password incorrect');
             }
         };
+        
+        // منع المسافات أثناء الكتابة في حقل اسم المستخدم
+        document.getElementById('username').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\s/g, '');
+        });
+        
+        // منع المسافات أثناء الكتابة في حقل كلمة المرور
+        document.getElementById('password').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\s/g, '');
+        });
     </script>
 </body>
 </html>
