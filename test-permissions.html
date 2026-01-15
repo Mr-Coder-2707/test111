@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار نظام الصلاحيات</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .user-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .user-card.seller {
+            border-left-color: #f59e0b;
+        }
+        .credentials {
+            background: #e0e7ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            direction: ltr;
+            text-align: left;
+        }
+        .permissions {
+            margin-top: 10px;
+        }
+        .permission-item {
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+        .permission-item.allowed::before {
+            content: "✅";
+            margin-left: 10px;
+        }
+        .permission-item.denied::before {
+            content: "❌";
+            margin-left: 10px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn.danger {
+            background: #ef4444;
+        }
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+        .current-user {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 اختبار نظام الصلاحيات</h1>
+        
+        <div id="currentUserDiv" class="current-user" style="display: none;">
+            <h3>المستخدم الحالي: <span id="currentUserName"></span></h3>
+            <p>الصلاحية: <span id="currentUserRole"></span></p>
+            <button class="btn danger" onclick="logout()">تسجيل خروج</button>
+        </div>
+
+        <div class="section">
+            <h2>👨‍💼 المديرون (صلاحيات كاملة)</h2>
+            
+            <div class="user-card">
+                <h3>المهندس محمود صبري الخواص</h3>
+                <div class="credentials">mahmoud / 2707</div>
+                <div class="permissions">
+                    <div class="permission-item allowed">جميع الصفحات والميزات</div>
+                    <div class="permission-item allowed">إدارة الأصناف والمنتجات</div>
+                    <div class="permission-item allowed">المشتريات والموردين</div>
+                    <div class="permission-item allowed">المصروفات والتقارير</div>
+                </div>
+            </div>
+
+            <div class="user-card">
+                <h3>المهندس محمد صبري الخواص</h3>
+                <div class="credentials">mohamd / 1208</div>
+                <div class="permissions">
+                    <div class="permission-item allowed">جميع الصفحات والميزات</div>
+                    <div class="permission-item allowed">إدارة الأصناف والمنتجات</div>
+                    <div class="permission-item allowed">المشتريات والموردين</div>
+                    <div class="permission-item allowed">المصروفات والتقارير</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🛒 البائع (صلاحية البيع فقط)</h2>
+            
+            <div class="user-card seller">
+                <h3>البائع</h3>
+                <div class="credentials" style="background: #fef3c7;">seller / 123</div>
+                <div class="permissions">
+                    <div class="permission-item allowed">صفحة المبيعات (البيع فقط)</div>
+                    <div class="permission-item allowed">لوحة التحكم (عرض فقط)</div>
+                    <div class="permission-item allowed">طباعة الفواتير</div>
+                    <div class="permission-item denied">إدارة الأصناف</div>
+                    <div class="permission-item denied">المشتريات والموردين</div>
+                    <div class="permission-item denied">المصروفات والعملاء</div>
+                    <div class="permission-item denied">التقارير والأرباح</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 اختبار النظام</h2>
+            <p style="margin-bottom: 15px;">جرب تسجيل الدخول بحساب البائع ثم حاول الوصول للصفحات المحظورة:</p>
+            <a href="login.html" class="btn">تسجيل الدخول</a>
+            <a href="dashboard.html" class="btn">لوحة التحكم</a>
+            <a href="index.html" class="btn">المبيعات</a>
+            <a href="products.html" class="btn danger">الأصناف (محظورة للبائع)</a>
+            <a href="purchases.html" class="btn danger">المشتريات (محظورة للبائع)</a>
+        </div>
+
+        <div class="section">
+            <h2>📋 كيفية الاختبار</h2>
+            <ol style="line-height: 2;">
+                <li>اذهب لصفحة تسجيل الدخول</li>
+                <li>سجل دخول بحساب البائع: <code>seller / 123</code></li>
+                <li>لاحظ أن القائمة تحتوي فقط على المبيعات ولوحة التحكم</li>
+                <li>حاول الوصول لصفحة محظورة (مثل الأصناف أو المشتريات)</li>
+                <li>سيتم منعك تلقائياً وإعادة توجيهك لصفحة المبيعات</li>
+                <li>سجل خروج ثم سجل دخول بحساب مدير لتجربة الصلاحيات الكاملة</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script>
+        // عرض المستخدم الحالي إن وجد
+        const user = DB.getCurrentUser();
+        if (user) {
+            document.getElementById('currentUserDiv').style.display = 'block';
+            document.getElementById('currentUserName').textContent = user.name;
+            document.getElementById('currentUserRole').textContent = 
+                user.role === 'admin' ? 'مدير - صلاحيات كاملة' : 'بائع - البيع فقط';
+        }
+
+        function logout() {
+            DB.logout();
+        }
+    </script>
+</body>
+</html>

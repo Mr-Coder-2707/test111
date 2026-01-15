@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="صفحة تسجيل الدخول إلى نظام نقاط البيع لأولاد الخواص" />
+    <meta name="keywords" content="تسجيل الدخول، أولاد الخواص، نقطة بيع" />
+    <meta name="author" content="أولاد الخواص" />
+    <meta name="theme-color" content="#1e40af" />
     <title>تسجيل الدخول | أولاد الخواص</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -129,7 +137,8 @@
             </button>
         </form>
         <p style="margin-top: 1.5rem; color: var(--text-gray); font-size: 0.9rem;">
-            تلميح: mahmoud / 2707 أو mohamd / 1208 للوصول الكامل
+            <strong>المديرين:</strong> mahmoud / 2707 أو mohamd / 1208<br>
+            <strong>البائع:</strong> seller / 123 (المبيعات فقط)
         </p>
         <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
             <p style="font-size: 0.85rem; color: var(--text-gray); margin: 0.5rem 0;">
@@ -159,26 +168,35 @@
             console.log('Username:', u, 'Length:', u.length);
             console.log('Password:', p, 'Length:', p.length);
             
-            if ((u === 'mahmoud' && p === '2707') || (u === 'mohamd' && p === '1208') || (u === 'cashier' && p === '123')) {
-                let userName = 'الكاشير';
-                let userRole = 'staff';
-                
-                if (u === 'mahmoud') {
-                    userName = 'المهندس محمود صبري الخواص';
-                    userRole = 'admin';
-                } else if (u === 'mohamd') {
-                    userName = 'المهندس محمد صبري الخواص';
-                    userRole = 'admin';
-                }
-                
+            // المديرين: محمد ومحمود
+            if (u === 'mahmoud' && p === '2707') {
                 const user = {
-                    name: userName,
-                    role: userRole,
+                    name: 'المهندس محمود صبري الخواص',
+                    role: 'admin',
                     username: u
                 };
                 DB.setCurrentUser(user);
-                DB.showToast('تم تسجيل الدخول بنجاح');
+                DB.showToast('مرحباً بك يا مهندس محمود - مدير');
                 setTimeout(() => location.href = 'dashboard.html', 1000);
+            } else if (u === 'mohamd' && p === '1208') {
+                const user = {
+                    name: 'المهندس محمد صبري الخواص',
+                    role: 'admin',
+                    username: u
+                };
+                DB.setCurrentUser(user);
+                DB.showToast('مرحباً بك يا مهندس محمد - مدير');
+                setTimeout(() => location.href = 'dashboard.html', 1000);
+            } else if (u === 'seller' && p === '123') {
+                // البائع: صلاحية البيع فقط
+                const user = {
+                    name: 'البائع',
+                    role: 'seller',
+                    username: u
+                };
+                DB.setCurrentUser(user);
+                DB.showToast('مرحباً - صلاحيات البيع فقط');
+                setTimeout(() => location.href = 'index.html', 1000);
             } else {
                 DB.showToast('اسم المستخدم أو كلمة المرور خطأ!', 'error');
                 console.error('Login failed - Username or password incorrect');

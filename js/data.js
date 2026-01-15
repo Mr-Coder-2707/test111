@@ -92,6 +92,44 @@ const DB = {
     DB.save(DB.KEYS.PRODUCTS, products);
     return { id: sale.id };
   },
+  
+  // Returns (المرتجعات)
+  saveReturn: async (saleId, returnItems) => {
+    const sales = await DB.getSales();
+    const sale = sales.find(s => s.id === saleId);
+    
+    if (!sale) {
+      throw new Error('الفاتورة غير موجودة');
+    }
+    
+    // Mark sale as returned
+    sale.returned = true;
+    sale.returnDate = new Date().toISOString();
+    sale.returnedItems = returnItems;
+    
+    DB.save(DB.KEYS.SALES, sales);
+    
+    // Return stock
+    const products = await DB.getProducts();
+    returnItems.forEach(item => {
+      const p = products.find(prod => prod.id === item.id);
+      if (p) p.stock += item.quantity;
+    });
+    DB.save(DB.KEYS.PRODUCTS, products);
+    
+    // Update customer balance if debt
+    if (sale.paymentType === 'debt' && sale.customer) {
+      const customers = await DB.getCustomers();
+      const customer = customers.find(c => c.name === sale.customer);
+      if (customer) {
+        const returnTotal = returnItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        customer.balance = (customer.balance || 0) - returnTotal;
+        DB.save(DB.KEYS.CUSTOMERS, customers);
+      }
+    }
+    
+    return { success: true };
+  },
 
   // Suppliers
   getSuppliers: async () => DB.load(DB.KEYS.SUPPLIERS),
@@ -226,6 +264,44 @@ const DB = {
   getCurrentUser: () => JSON.parse(sessionStorage.getItem(DB.KEYS.USER)) || null,
   setCurrentUser: (user) => sessionStorage.setItem(DB.KEYS.USER, JSON.stringify(user)),
   logout: () => { sessionStorage.removeItem(DB.KEYS.USER); location.href = 'login.html'; },
+  
+  // نظام الصلاحيات
+  isAdmin: () => {
+    const user = DB.getCurrentUser();
+    return user && user.role === 'admin';
+  },
+  
+  isSeller: () => {
+    const user = DB.getCurrentUser();
+    return user && user.role === 'seller';
+  },
+  
+  checkPermission: (action) => {
+    const user = DB.getCurrentUser();
+    if (!user) {
+      DB.showToast('يجب تسجيل الدخول أولاً', 'error');
+      location.href = 'login.html';
+      return false;
+    }
+    
+    // المديرين لديهم جميع الصلاحيات
+    if (user.role === 'admin') return true;
+    
+    // البائعين يمكنهم البيع فقط (صفحة المبيعات)
+    if (user.role === 'seller') {
+      const allowedPages = ['index.html', 'dashboard.html', 'print-invoice.html', 'print-barcode.html'];
+      const currentPage = location.pathname.split('/').pop();
+      
+      if (!allowedPages.includes(currentPage)) {
+        DB.showToast('ليس لديك صلاحية للوصول لهذه الصفحة', 'error');
+        setTimeout(() => location.href = 'index.html', 1500);
+        return false;
+      }
+      return true;
+    }
+    
+    return false;
+  },
 
   // System
   init: () => {

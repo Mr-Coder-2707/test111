@@ -3,11 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="طباعة باركود المنتجات - نظام أولاد الخواص">
+    <meta name="keywords" content="باركود، طباعة، منتجات">
+    <meta name="author" content="أولاد الخواص">
+    <meta name="theme-color" content="#1e40af">
     <title>طباعة باركود | أولاد الخواص</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="libs/fontawesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #barcodeContainer, #barcodeContainer * {
+                visibility: visible;
+            }
+            
+            #barcodeContainer {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 10mm !important;
+                padding: 10mm !important;
+                background: white !important;
+            }
+            
+            .barcode-item {
+                page-break-inside: avoid;
+                border: 1px dashed #000 !important;
+                padding: 5mm !important;
+                background: white !important;
+            }
+            
+            .barcode-item h4 {
+                color: #000 !important;
+            }
+            
+            .barcode-item p {
+                color: #000 !important;
+            }
+            
+            nav, .card-title, .barcode-grid-controls, button, .btn {
+                display: none !important;
+            }
+        }
+        
+        .barcode-item {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed rgba(255,255,255,0.1);
+            position: relative;
+        }
+        
+        .barcode-item h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+        
+        .barcode-item svg {
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+        
+        .barcode-item p {
+            margin: 0.3rem 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .barcode-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .barcode-item .remove-btn:hover {
+            background: #dc2626;
+        }
+    </style>
 </head>
 <body>
     <div class="nav-overlay" onclick="DB.toggleMenu()"></div>
@@ -15,7 +114,7 @@
         <div class="logo"><i class="fas fa-faucet-drip"></i> أولاد الخواص</div>
         <div class="nav-toggle" onclick="DB.toggleMenu()"><i class="fas fa-bars"></i></div>
         <div class="nav-links">
-            <button class="nav-close" onclick="DB.toggleMenu()"><i class="fas fa-times"></i></button>
+            <button type="button" class="nav-close" onclick="DB.toggleMenu()" aria-label="إغلاق القائمة"><i class="fas fa-times"></i></button>
             <a href="dashboard.html"><i class="fas fa-chart-pie"></i> الرئيسة</a>
             <a href="index.html"><i class="fas fa-cash-register"></i> المبيعات</a>
             <a href="products.html"><i class="fas fa-boxes-stacked"></i> الأصناف</a>
@@ -27,49 +126,51 @@
     <div class="container">
         <div class="card animate-fade">
             <div class="card-title"><i class="fas fa-barcode"></i> طباعة باركود الأصناف</div>
-            
-            <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+
+            <div class="barcode-grid-controls">
                 <div class="input-group">
-                    <label>اختر الصنف</label>
-                    <select id="productSelect" style="padding: 10px;">
+                    <label for="productSelect">اختر الصنف</label>
+                    <select id="productSelect" class="barcode-product-select">
                         <option value="">اختر صنف...</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>عدد النسخ</label>
-                    <input type="number" id="copies" value="1" min="1" max="100" style="padding: 10px;">
+                    <label for="copies">عدد النسخ</label>
+                    <input type="number" id="copies" value="1" min="1" max="100" class="barcode-copies-input">
                 </div>
-                <div style="display: flex; align-items: flex-end;">
-                    <button class="btn btn-primary" onclick="generateBarcode()" style="width: 100%;">
+                <div class="barcode-add-btn-wrapper">
+                    <button type="button" class="btn btn-primary barcode-add-btn" onclick="generateBarcode()">
                         <i class="fas fa-plus"></i> إضافة للطباعة
                     </button>
                 </div>
             </div>
 
-            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="margin: 0; color: var(--primary-color);">
+            <div class="barcode-preview-section">
+                <div class="barcode-preview-header">
+                    <h3 class="barcode-preview-title">
                         <i class="fas fa-print"></i> معاينة الطباعة
                     </h3>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-success" onclick="printBarcodes()" style="padding: 8px 20px;">
+                    <div class="barcode-action-buttons">
+                        <button type="button" class="btn btn-success barcode-print-btn" onclick="printBarcodes()">
                             <i class="fas fa-print"></i> طباعة
                         </button>
-                        <button class="btn btn-danger" onclick="clearAll()" style="padding: 8px 20px;">
+                        <button type="button" class="btn btn-danger barcode-clear-btn" onclick="clearAll()">
                             <i class="fas fa-trash"></i> مسح الكل
                         </button>
                     </div>
                 </div>
-                
-                <div id="barcodeContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; min-height: 200px;">
-                    <p style="text-align: center; opacity: 0.5; grid-column: 1/-1;">اختر صنف لإضافة باركود...</p>
+
+                <div id="barcodeContainer" class="barcode-container">
+                    <p class="barcode-placeholder">اختر صنف لإضافة باركود...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Print Styles -->
-    <style>
+    <script src="js/initial_data.js"></script>
+    <script src="js/company-info.js"></script>
+    <script src="js/data.js"></script>
+    <script>
         @media print {
             body * {
                 visibility: hidden;
@@ -164,6 +265,7 @@
     <script src="js/initial_data.js"></script>
     <script src="js/company-info.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/permissions.js"></script>
     <script>
         let products = [];
         let barcodeCount = 0;
@@ -212,7 +314,7 @@
                 div.className = 'barcode-item';
                 div.id = `barcode-${barcodeCount}`;
                 div.innerHTML = `
-                    <button class="remove-btn" onclick="removeBarcode('barcode-${barcodeCount}')">
+                    <button type="button" class="remove-btn" onclick="removeBarcode('barcode-${barcodeCount}')" aria-label="إزالة الباركود">
                         <i class="fas fa-times"></i>
                     </button>
                     <h4>${product.name}</h4>
@@ -247,16 +349,16 @@
                 element.remove();
                 DB.showToast('تم إزالة الباركود');
             }
-            
+
             const container = document.getElementById('barcodeContainer');
             if (container.children.length === 0) {
-                container.innerHTML = '<p style="text-align: center; opacity: 0.5; grid-column: 1/-1;">اختر صنف لإضافة باركود...</p>';
+                container.innerHTML = '<p class="barcode-placeholder">اختر صنف لإضافة باركود...</p>';
             }
         }
 
         function clearAll() {
             const container = document.getElementById('barcodeContainer');
-            container.innerHTML = '<p style="text-align: center; opacity: 0.5; grid-column: 1/-1;">اختر صنف لإضافة باركود...</p>';
+            container.innerHTML = '<p class="barcode-placeholder">اختر صنف لإضافة باركود...</p>';
             barcodeCount = 0;
             DB.showToast('تم مسح جميع الباركودات');
         }

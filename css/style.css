@@ -894,3 +894,300 @@ a,
         transform: scale(0.98);
     }
 }
+
+/* Modal Styles for Returns */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: #1e293b;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.close {
+    color: var(--text-gray);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close:hover,
+.close:focus {
+    color: var(--danger);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* Print Barcode Page Styles */
+.barcode-grid-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.barcode-product-select {
+    padding: 10px;
+}
+
+.barcode-copies-input {
+    padding: 10px;
+}
+
+.barcode-add-btn-wrapper {
+    display: flex;
+    align-items: flex-end;
+}
+
+.barcode-add-btn {
+    width: 100%;
+}
+
+.barcode-preview-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(255,255,255,0.1);
+}
+
+.barcode-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.barcode-preview-title {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.barcode-action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.barcode-print-btn {
+    padding: 8px 20px;
+}
+
+.barcode-clear-btn {
+    padding: 8px 20px;
+}
+
+.barcode-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    min-height: 200px;
+}
+
+.barcode-placeholder {
+    text-align: center;
+    opacity: 0.5;
+    grid-column: 1/-1;
+}
+
+/* Watermark Styles */
+.watermark-pos-1 {
+    top: 15%;
+    left: 20%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-2 {
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-3 {
+    top: 15%;
+    left: 80%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-4 {
+    top: 35%;
+    left: 20%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-5 {
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-6 {
+    top: 35%;
+    left: 80%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-7 {
+    top: 55%;
+    left: 20%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-8 {
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-9 {
+    top: 55%;
+    left: 80%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-10 {
+    top: 75%;
+    left: 20%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-11 {
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-12 {
+    top: 75%;
+    left: 80%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-13 {
+    top: 95%;
+    left: 20%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-14 {
+    top: 95%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.watermark-pos-15 {
+    top: 95%;
+    left: 80%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Invoice Styles */
+.invoice-subtitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.invoice-sale-type {
+    margin-top: 5px;
+    font-weight: 600;
+    color: #1e40af;
+    font-size: 0.85rem;
+}
+
+.invoice-footer-thanks {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.invoice-footer-note {
+    font-size: 0.75rem;
+}
+
+.items-table th:first-child {
+    width: 50px;
+}
+
+.items-table th:nth-child(3) {
+    width: 100px;
+}
+
+.items-table th:nth-child(4) {
+    width: 80px;
+}
+
+.items-table th:nth-child(5) {
+    width: 120px;
+}
+
+.items-table td:first-child {
+    text-align: center;
+}
+
+.items-table td:nth-child(4) {
+    text-align: center;
+}
+
+.items-table td:nth-child(5) {
+    font-weight: 600;
+}

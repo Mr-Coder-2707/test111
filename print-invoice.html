@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="طباعة فاتورة المبيعات - نظام أولاد الخواص" />
+    <meta name="keywords" content="فاتورة، طباعة، مبيعات" />
+    <meta name="author" content="أولاد الخواص" />
+    <meta name="theme-color" content="#1e40af" />
     <title>طباعة فاتورة - أولاد الخواص</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
     <style>
         * {
             margin: 0;
@@ -300,6 +308,52 @@
             margin: 0 auto;
         }
 
+        /* أزرار التحكم في الختم */
+        .stamp-controls {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            background: rgba(30, 64, 175, 0.95);
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 1;
+            z-index: 200;
+        }
+
+        .stamp-control-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid white;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: #1e40af;
+            user-select: none;
+        }
+
+        .stamp-control-btn:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            transform: scale(1.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .stamp-control-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+
         .stamp-circle {
             position: absolute;
             width: 100%;
@@ -410,6 +464,10 @@
                 cursor: default;
             }
 
+            .stamp-controls {
+                display: none !important;
+            }
+
             .electronic-stamp {
                 width: 180px;
                 height: 180px;
@@ -437,27 +495,27 @@
 <body>
     <div class="invoice-container">
         <!-- Watermark -->
-        <div class="watermark" style="top: 15%; left: 20%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 15%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 15%; left: 80%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 35%; left: 20%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 35%; left: 80%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 55%; left: 20%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 55%; left: 80%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 75%; left: 20%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 75%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 75%; left: 80%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 95%; left: 20%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 95%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
-        <div class="watermark" style="top: 95%; left: 80%; transform: translate(-50%, -50%) rotate(-45deg);">أولاد الخواص</div>
+        <div class="watermark watermark-pos-1">أولاد الخواص</div>
+        <div class="watermark watermark-pos-2">أولاد الخواص</div>
+        <div class="watermark watermark-pos-3">أولاد الخواص</div>
+        <div class="watermark watermark-pos-4">أولاد الخواص</div>
+        <div class="watermark watermark-pos-5">أولاد الخواص</div>
+        <div class="watermark watermark-pos-6">أولاد الخواص</div>
+        <div class="watermark watermark-pos-7">أولاد الخواص</div>
+        <div class="watermark watermark-pos-8">أولاد الخواص</div>
+        <div class="watermark watermark-pos-9">أولاد الخواص</div>
+        <div class="watermark watermark-pos-10">أولاد الخواص</div>
+        <div class="watermark watermark-pos-11">أولاد الخواص</div>
+        <div class="watermark watermark-pos-12">أولاد الخواص</div>
+        <div class="watermark watermark-pos-13">أولاد الخواص</div>
+        <div class="watermark watermark-pos-14">أولاد الخواص</div>
+        <div class="watermark watermark-pos-15">أولاد الخواص</div>
         
         <div class="invoice-header">
-            <h1>🚰 أولاد صبري الخواص</h1>
-            <p style="font-size: 0.9rem; font-weight: 600;">المعلم صبري الخواص و الولادة</p>
+            <h1>🚰 أولاد  الخواص</h1>
+            <p class="invoice-subtitle">المعلم صبري الخواص و الولادة</p>
             <p>📞 الهاتف: 01154031550 - 01500272762</p>
-            <p style="margin-top: 5px; font-weight: 600; color: #1e40af; font-size: 0.85rem;">فاتورة بيع</p>
+            <p class="invoice-sale-type">فاتورة بيع</p>
         </div>
         <div class="invoice-info">
             <div class="info-group">
@@ -485,11 +543,11 @@
         <table class="items-table">
             <thead>
                 <tr>
-                    <th style="width: 50px;">#</th>
+                    <th>#</th>
                     <th>الصنف</th>
-                    <th style="width: 100px;">السعر</th>
-                    <th style="width: 80px;">الكمية</th>
-                    <th style="width: 120px;">الإجمالي</th>
+                    <th>السعر</th>
+                    <th>الكمية</th>
+                    <th>الإجمالي</th>
                 </tr>
             </thead>
             <tbody id="itemsTableBody">
@@ -523,6 +581,13 @@
         </div>
 
         <div class="stamp-container">
+            <div class="stamp-controls">
+                <button class="stamp-control-btn" onclick="zoomIn()" title="تكبير">➕</button>
+                <button class="stamp-control-btn" onclick="zoomOut()" title="تصغير">➖</button>
+                <button class="stamp-control-btn" onclick="rotateLeft()" title="تدوير لليسار">↶</button>
+                <button class="stamp-control-btn" onclick="rotateRight()" title="تدوير لليمين">↷</button>
+                <button class="stamp-control-btn" onclick="resetStamp()" title="إعادة ضبط">⟲</button>
+            </div>
             <div class="electronic-stamp">
                 <div class="stamp-circle">
                     <div class="stamp-inner-circle"></div>
@@ -563,8 +628,8 @@
         </div>
 
         <div class="invoice-footer">
-            <p style="font-size: 0.85rem; margin-bottom: 5px;">شكراً لتعاملكم معنا</p>
-            <p style="font-size: 0.75rem;">هذه الفاتورة صادرة إلكترونياً ولا تحتاج لتوقيع</p>
+            <p class="invoice-footer-thanks">شكراً لتعاملكم معنا</p>
+            <p class="invoice-footer-note">هذه الفاتورة صادرة إلكترونياً ولا تحتاج لتوقيع</p>
         </div>
     </div>
 
@@ -629,11 +694,11 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="text-align: center;">${index + 1}</td>
+                    <td>${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${item.price.toFixed(2)} ج.م</td>
-                    <td style="text-align: center;">${item.quantity}</td>
-                    <td style="font-weight: 600;">${itemTotal.toFixed(2)} ج.م</td>
+                    <td>${item.quantity}</td>
+                    <td>${itemTotal.toFixed(2)} ج.م</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -655,8 +720,11 @@
         let initialY;
         let xOffset = 0;
         let yOffset = 0;
+        let currentRotation = -5; // الدوران الأولي
+        let currentScale = 1; // الحجم الأولي
 
         const stampContainer = document.querySelector('.stamp-container');
+        const stampCircle = document.querySelector('.stamp-circle');
 
         if (stampContainer) {
             stampContainer.addEventListener('mousedown', dragStart);
@@ -667,9 +735,65 @@
             stampContainer.addEventListener('touchstart', dragStart);
             document.addEventListener('touchmove', drag);
             document.addEventListener('touchend', dragEnd);
+
+            // Mouse wheel for zoom
+            stampContainer.addEventListener('wheel', handleWheel);
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }
+
+        function zoomIn() {
+            currentScale += 0.1;
+            if (currentScale > 2.5) currentScale = 2.5;
+            updateStampTransform();
+        }
+
+        function zoomOut() {
+            currentScale -= 0.1;
+            if (currentScale < 0.3) currentScale = 0.3;
+            updateStampTransform();
+        }
+
+        function rotateLeft() {
+            currentRotation -= 15;
+            updateStampTransform();
+        }
+
+        function rotateRight() {
+            currentRotation += 15;
+            updateStampTransform();
+        }
+
+        function resetStamp() {
+            currentRotation = -5;
+            currentScale = 1;
+            xOffset = 0;
+            yOffset = 0;
+            currentX = 0;
+            currentY = 0;
+            stampContainer.style.transform = `translate3d(0px, 0px, 0)`;
+            updateStampTransform();
+        }
+
+        function updateStampTransform() {
+            if (stampCircle) {
+                stampCircle.style.transform = `rotate(${currentRotation}deg) scale(${currentScale})`;
+            }
         }
 
         function dragStart(e) {
+            // Don't drag if clicking on control buttons
+            if (e.target.classList.contains('stamp-control-btn')) {
+                return;
+            }
+
             if (e.type === 'touchstart') {
                 initialX = e.touches[0].clientX - xOffset;
                 initialY = e.touches[0].clientY - yOffset;
